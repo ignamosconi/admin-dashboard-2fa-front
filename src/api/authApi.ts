@@ -3,6 +3,7 @@ import {
   TokenResponse,
   AdminLoginResponse,
   Admin2faSetupResponse,
+  Reset2faPayload,
 } from '@/types/api.types';
 
 export const authApi = {
@@ -56,6 +57,8 @@ export const authApi = {
 
   // Resetea el 2FA del admin autenticado — requiere confirmar password actual
   reset2fa: async (password: string): Promise<void> => {
-    await apiClient.post('/admin/auth/2fa/reset', { password });
+    // Usamos la interfaz para tipar el body que se envía al servidor
+    const payload: Reset2faPayload = { password };
+    await apiClient.post('/admin/auth/2fa/reset', payload);
   },
 };
