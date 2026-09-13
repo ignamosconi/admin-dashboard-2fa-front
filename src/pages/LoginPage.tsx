@@ -251,7 +251,7 @@ export function LoginPage() {
         {step === 'credentials' && (
           <>
             <Title order={2} mb={4} mt="sm">Iniciar sesión</Title>
-            <Text size="sm" c="dimmed" mb="lg">Panel de administración del SSO</Text>
+            <Text size="sm" c="dimmed" mb="lg">Panel de administración de [nombre app]</Text>
             <form onSubmit={(e) => void handleCredentials(e)}>
               <TextInput
                 label="Usuario"

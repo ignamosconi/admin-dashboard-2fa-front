@@ -64,7 +64,9 @@ cp .env.example .env
 ```bash
 npm install
 npm run dev    # desarrollo
+
 npm run build  # producción
+npm run preview #ejecutar build
 ```
 
 ## Páginas
