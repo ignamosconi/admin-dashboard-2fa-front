@@ -7,6 +7,8 @@ import { useRef, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import logoUtn from '@/assets/logo-utn.png';
+import { ENV } from '@/config/env';
+
 
 const NAVBAR_EXPANDED = 220;
 const NAVBAR_COLLAPSED = 60;
@@ -196,7 +198,7 @@ export function Navbar({ isOpen, onToggle, onClose, isMobile }: NavbarProps) {
                 {isOpen && (
                   <Box style={{ overflow: 'hidden' }}>
                     <Text fw={600} size="sm" lh={1.2} style={{ whiteSpace: 'nowrap' }}>
-                      Nombre App
+                      {ENV.APP_NAME}
                     </Text>
                     <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
                       Panel de administración

@@ -14,6 +14,8 @@ import { useAuthStore } from '@/store/authStore';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import logoUtn from '@/assets/logo-utn.png';
 import type { Admin2faSetupResponse } from '@/types/api.types';
+import { ENV } from '@/config/env';
+
 
 type LoginStep = 'credentials' | 'setup_2fa' | 'validate_2fa';
 
@@ -251,7 +253,7 @@ export function LoginPage() {
         {step === 'credentials' && (
           <>
             <Title order={2} mb={4} mt="sm">Iniciar sesión</Title>
-            <Text size="sm" c="dimmed" mb="lg">Panel de administración de [nombre app]</Text>
+            <Text size="sm" c="dimmed" mb="lg">Panel de administración de {ENV.APP_NAME}</Text>
             <form onSubmit={(e) => void handleCredentials(e)}>
               <TextInput
                 label="Usuario"
