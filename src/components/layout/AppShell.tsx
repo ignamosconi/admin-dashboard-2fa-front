@@ -15,16 +15,13 @@ export function AppShell() {
     if (isMobile === undefined) return;
     if (isMobile) close();
     else open();
-  }, [isMobile]);
+  }, [isMobile, close, open]);
 
   // En mobile el layout nunca cambia de ancho — el navbar abierto va por encima
-  const layoutWidth = isMobile ? NAVBAR_COLLAPSED : (opened ? NAVBAR_EXPANDED : NAVBAR_COLLAPSED);
+  const layoutWidth = isMobile ? NAVBAR_COLLAPSED : opened ? NAVBAR_EXPANDED : NAVBAR_COLLAPSED;
 
   return (
-    <MantineAppShell
-      navbar={{ width: layoutWidth, breakpoint: 1 }}
-      padding="md"
-    >
+    <MantineAppShell navbar={{ width: layoutWidth, breakpoint: 1 }} padding="md">
       <MantineAppShell.Navbar style={{ transition: 'width 200ms ease', overflow: 'visible' }}>
         <Navbar isOpen={opened} onToggle={toggle} onClose={close} isMobile={!!isMobile} />
       </MantineAppShell.Navbar>
