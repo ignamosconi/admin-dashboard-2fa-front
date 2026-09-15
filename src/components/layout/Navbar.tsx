@@ -2,13 +2,14 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   Stack, Text, UnstyledButton, Group, Box, Divider, Image, Loader, Tooltip,
 } from '@mantine/core';
-import { IconUser, IconUsers, IconLogout, IconDashboard, IconQuestionMark } from '@tabler/icons-react';
-import { useRef, useState } from 'react';
+import {
+  IconUser, IconUsers, IconLogout, IconDashboard, IconQuestionMark, IconSettings, IconChevronDown,
+} from '@tabler/icons-react';
+import { useRef, useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import logoUtn from '@/assets/logo-utn.png';
 import { ENV } from '@/config/env';
-
 
 const NAVBAR_EXPANDED = 220;
 const NAVBAR_COLLAPSED = 60;
@@ -95,39 +96,148 @@ function NavItem({ to, label, icon: Icon, isOpen }: NavItemProps) {
   const location = useLocation();
   const isActive = location.pathname === to;
 
-  const button = (
-    <NavLink to={to}>
-      {() => (
-        <UnstyledButton
-          w="100%"
-          px="sm"
-          py={7}
-          style={(theme) => ({
-            borderRadius: theme.radius.sm,
-            background: isActive ? 'var(--mantine-color-orange-light)' : 'transparent',
-            color: isActive ? '#f5a705' : 'var(--mantine-color-text)',
-          })}
-        >
-          <Group gap="sm" justify={isOpen ? 'flex-start' : 'center'} wrap="nowrap">
-            <Icon size={15} style={{ flexShrink: 0 }} />
-            {isOpen && (
-              <Text size="sm" style={{ whiteSpace: 'nowrap' }}>{label}</Text>
-            )}
-          </Group>
-        </UnstyledButton>
-      )}
-    </NavLink>
-  );
-
   if (!isOpen) {
     return (
       <Tooltip label={label} position="right" withArrow>
-        {button}
+        <NavLink to={to} style={{ textDecoration: 'none', display: 'block' }}>
+          <UnstyledButton
+            w={40}
+            h={36}
+            mx="auto"
+            style={(theme) => ({
+              borderRadius: theme.radius.sm,
+              background: isActive ? 'var(--mantine-color-orange-light)' : 'transparent',
+              color: isActive ? '#f5a705' : 'var(--mantine-color-text)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            })}
+          >
+            <Icon size={18} />
+          </UnstyledButton>
+        </NavLink>
       </Tooltip>
     );
   }
 
-  return button;
+  return (
+    <NavLink to={to} style={{ textDecoration: 'none', display: 'block' }}>
+      <UnstyledButton
+        w="100%"
+        px="sm"
+        py={7}
+        style={(theme) => ({
+          borderRadius: theme.radius.sm,
+          background: isActive ? 'var(--mantine-color-orange-light)' : 'transparent',
+          color: isActive ? '#f5a705' : 'var(--mantine-color-text)',
+        })}
+      >
+        <Group gap="sm" justify="flex-start" align="center" wrap="nowrap">
+          <Icon size={18} style={{ flexShrink: 0 }} />
+          <Text size="sm" style={{ whiteSpace: 'nowrap' }}>{label}</Text>
+        </Group>
+      </UnstyledButton>
+    </NavLink>
+  );
+}
+
+// ── NavSubMenu (Desplegable) ──────────────────────────────────────────────────
+
+interface NavSubItem {
+  to: string;
+  label: string;
+  icon: React.ElementType;
+}
+
+interface NavSubMenuProps {
+  label: string;
+  icon: React.ElementType;
+  isOpen: boolean;
+  onToggleNavbar: () => void;
+  items: NavSubItem[];
+}
+
+function NavSubMenu({ label, icon: Icon, isOpen, onToggleNavbar, items }: NavSubMenuProps) {
+  const location = useLocation();
+  const isAnyChildActive = items.some(item => location.pathname === item.to);
+  const [opened, setOpened] = useState(isAnyChildActive);
+
+  useEffect(() => {
+    if (isAnyChildActive) {
+      setOpened(true);
+    }
+  }, [location.pathname, isAnyChildActive]);
+
+  const handleParentClick = () => {
+    if (!isOpen) {
+      onToggleNavbar();
+      setOpened(true);
+    } else {
+      setOpened((o) => !o);
+    }
+  };
+
+  if (!isOpen) {
+    return (
+      <Tooltip label={label} position="right" withArrow>
+        <UnstyledButton
+          w={40}
+          h={36}
+          mx="auto"
+          onClick={handleParentClick}
+          style={(theme) => ({
+            borderRadius: theme.radius.sm,
+            background: isAnyChildActive ? 'var(--mantine-color-orange-light)' : 'transparent',
+            color: isAnyChildActive ? '#f5a705' : 'var(--mantine-color-text)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          })}
+        >
+          <Icon size={18} />
+        </UnstyledButton>
+      </Tooltip>
+    );
+  }
+
+  return (
+    <Box>
+      <UnstyledButton
+        w="100%"
+        px="sm"
+        py={7}
+        onClick={handleParentClick}
+        style={(theme) => ({
+          borderRadius: theme.radius.sm,
+          background: isAnyChildActive && !opened ? 'var(--mantine-color-orange-light)' : 'transparent',
+          color: isAnyChildActive ? '#f5a705' : 'var(--mantine-color-text)',
+        })}
+      >
+        <Group justify="space-between" align="center" wrap="nowrap">
+          <Group gap="sm" align="center" wrap="nowrap">
+            <Icon size={18} style={{ flexShrink: 0 }} />
+            <Text size="sm" style={{ whiteSpace: 'nowrap' }}>{label}</Text>
+          </Group>
+          <IconChevronDown
+            size={14}
+            style={{
+              transform: opened ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 200ms ease',
+              flexShrink: 0,
+            }}
+          />
+        </Group>
+      </UnstyledButton>
+
+      <Box style={{ display: opened ? 'block' : 'none' }}>
+        <Stack gap={2} mt={2} pl="md">
+          {items.map((item) => (
+            <NavItem key={item.to} {...item} isOpen={true} />
+          ))}
+        </Stack>
+      </Box>
+    </Box>
+  );
 }
 
 // ── Navbar ────────────────────────────────────────────────────────────────────
@@ -154,8 +264,6 @@ export function Navbar({ isOpen, onToggle, onClose, isMobile }: NavbarProps) {
     }
   };
 
-  // En mobile: el contenedor interno se posiciona fixed y puede expandirse
-  // por encima del contenido. El AppShell siempre ve 60px.
   const visualWidth = isOpen ? NAVBAR_EXPANDED : NAVBAR_COLLAPSED;
 
   return (
@@ -190,8 +298,15 @@ export function Navbar({ isOpen, onToggle, onClose, isMobile }: NavbarProps) {
       >
         <DragHandle isOpen={isOpen} onToggle={onToggle} />
 
-        <Stack h="100%" justify="space-between" p="md" style={{ overflow: 'hidden' }}>
-          <Box>
+        <Stack h="100%" justify="space-between" p={isOpen ? 'md' : 'xs'} style={{ overflow: 'hidden' }}>
+          <Box
+            style={{
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            }}
+          >
             <NavLink to="/dashboard" style={{ textDecoration: 'none', color: 'inherit' }}>
               <Group mb="xl" gap="xs" justify={isOpen ? 'flex-start' : 'center'} wrap="nowrap" style={{ cursor: 'pointer' }}>
                 <Image src={logoUtn} w={32} h={32} fit="contain" style={{ flexShrink: 0 }} />
@@ -208,10 +323,20 @@ export function Navbar({ isOpen, onToggle, onClose, isMobile }: NavbarProps) {
               </Group>
             </NavLink>
 
-            <Stack gap={2}>
+            <Stack gap={4}>
               <NavItem to="/dashboard" label="Dashboard" icon={IconDashboard} isOpen={isOpen} />
-              <NavItem to="/admins/me" label="Mi perfil" icon={IconUser} isOpen={isOpen} />
-              <NavItem to="/admins" label="Administradores" icon={IconUsers} isOpen={isOpen} />
+              
+              <NavSubMenu
+                label="Configuración"
+                icon={IconSettings}
+                isOpen={isOpen}
+                onToggleNavbar={onToggle}
+                items={[
+                  { to: '/admins/me', label: 'Mi perfil', icon: IconUser },
+                  { to: '/admins', label: 'Administradores', icon: IconUsers },
+                ]}
+              />
+
               <NavItem to="/faqs" label="FAQs" icon={IconQuestionMark} isOpen={isOpen} />
             </Stack>
           </Box>
